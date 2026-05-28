@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hormiga de Langton</title>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      background: black;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      gap: 20px;
+      overflow: hidden;
+    }
+
+    button {
+      padding: 15px 40px;
+      font-size: 20px;
+      border: none;
+      border-radius: 15px;
+      cursor: pointer;
+      background: white;
+      color: black;
+      transition: 0.3s;
+    }
+
+    button:hover {
+      transform: scale(1.05);
+    }
+
+    canvas {
+      border: 2px solid white;
+      background: black;
+    }
+  </style>
+</head>
+<body>
+
+  <button id="startBtn">Iniciar Simulación</button>
+
+  <canvas id="canvas" width="800" height="800"></canvas>
+
+  <script>
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+
+    const gridSize = 200;
+    const cellSize = canvas.width / gridSize;
+
+    let grid = [];
+
+    for (let y = 0; y < gridSize; y++) {
+      grid[y] = [];
+      for (let x = 0; x < gridSize; x++) {
+        grid[y][x] = 0;
+      }
+    }
+
+    let ant = {
+      x: Math.floor(gridSize / 2),
+      y: Math.floor(gridSize / 2),
+      dir: 0
+    };
+
+    function drawGrid() {
+      for (let y = 0; y < gridSize; y++) {
+        for (let x = 0; x < gridSize; x++) {
+          ctx.fillStyle = grid[y][x] ? 'white' : 'black';
+          ctx.fillRect(x * cellSize, y * cellSize, cellSize, cellSize);
+        }
+      }
+
+      ctx.fillStyle = 'red';
+      ctx.fillRect(
+        ant.x * cellSize,
+        ant.y * cellSize,
+        cellSize,
+        cellSize
+      );
+    }
+
+    function moveAnt() {
+      if (grid[ant.y][ant.x] === 0) {
+        ant.dir = (ant.dir + 1) % 4;
+        grid[ant.y][ant.x] = 1;
+      } else {
+        ant.dir = (ant.dir + 3) % 4;
+        grid[ant.y][ant.x] = 0;
+      }
+
+      switch (ant.dir) {
+        case 0:
+          ant.y--;
+          break;
+        case 1:
+          ant.x++;
+          break;
+        case 2:
+          ant.y++;
+          break;
+        case 3:
+          ant.x--;
+          break;
+      }
+
+      if (ant.x < 0) ant.x = gridSize - 1;
+      if (ant.x >= gridSize) ant.x = 0;
+      if (ant.y < 0) ant.y = gridSize - 1;
+      if (ant.y >= gridSize) ant.y = 0;
+    }
+
+    let running = false;
+
+    function animate() {
+      if (!running) return;
+
+      for (let i = 0; i < 10; i++) {
+        moveAnt();
+      }
+
+      drawGrid();
+      requestAnimationFrame(animate);
+    }
+
+    document.getElementById('startBtn').addEventListener('click', () => {
+      if (!running) {
+        running = true;
+        animate();
+      }
+    });
+
+    drawGrid();
+  </script>
+
+</body>
+</html>
